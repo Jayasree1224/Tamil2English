@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tamil2English</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:linear-gradient(-45deg,#4e73df,#1cc88a,#36b9cc,#6610f2);
+    background-size:400% 400%;
+    animation:gradientMove 10s ease infinite, fadeInBody 1s ease-in-out;
+    min-height:100vh;
+    color:white;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* Background Animation */
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+@keyframes fadeInBody{
+    from{opacity:0;}
+    to{opacity:1;}
+}
+
+/* Header */
+header{
+    padding:20px;
+    font-size:28px;
+    font-weight:600;
+    animation:slideDown 1s ease;
+}
+
+@keyframes slideDown{
+    from{transform:translateY(-50px);opacity:0;}
+    to{transform:translateY(0);opacity:1;}
+}
+
+/* Dashboard */
+#dashboard{
+    display:flex;
+    gap:30px;
+    margin-top:40px;
+}
+
+.card{
+    background:white;
+    color:#333;
+    padding:40px;
+    border-radius:20px;
+    width:250px;
+    text-align:center;
+    cursor:pointer;
+    transition:0.4s;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    animation:floatCard 3s ease-in-out infinite;
+}
+
+.card:hover{
+    transform:translateY(-15px) scale(1.05);
+    box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
+
+@keyframes floatCard{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-8px);}
+}
+
+/* Sections */
+.section{
+    display:none;
+    margin-top:30px;
+    width:90%;
+    max-width:800px;
+    animation:slideUp 0.6s ease;
+}
+
+@keyframes slideUp{
+    from{transform:translateY(40px);opacity:0;}
+    to{transform:translateY(0);opacity:1;}
+}
+
+/* Items */
+.item{
+    background:white;
+    color:#333;
+    padding:15px;
+    border-radius:10px;
+    margin:10px 0;
+    cursor:pointer;
+    transition:0.3s;
+    opacity:0;
+    transform:translateX(-20px);
+    animation:fadeItem 0.5s forwards;
+}
+
+.item:hover{
+    background:#f1f1f1;
+    transform:scale(1.03);
+}
+
+@keyframes fadeItem{
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+/* Back Button */
+.back-btn{
+    margin-bottom:20px;
+    cursor:pointer;
+    font-weight:600;
+    color:#fff;
+    transition:0.3s;
+}
+
+.back-btn:hover{
+    transform:translateX(-5px);
+}
+
+/* Mobile */
+@media(max-width:600px){
+    #dashboard{
+        flex-direction:column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>🌟 AI Tamil2English 🌟</header>
+
+<!-- Dashboard -->
+<div id="dashboard">
+    <div class="card" onclick="openSection('vocab')">
+        <h2>📘 Vocabulary</h2>
+        <p>Learn professional English words</p>
+    </div>
+
+    <div class="card" onclick="openSection('sentence')">
+        <h2>📝 Sentences</h2>
+        <p>Practice daily English sentences</p>
+    </div>
+</div>
+
+<!-- Sections -->
+<div id="vocab" class="section"></div>
+<div id="sentence" class="section"></div>
+
+<script>
+
+/* VOICE SETUP */
+let tamilVoice=null;
+let englishVoice=null;
+
+function loadVoices(){
+    let voices=speechSynthesis.getVoices();
+    tamilVoice=voices.find(v=>v.lang.includes("ta"));
+    englishVoice=voices.find(v=>v.lang.includes("en"));
+}
+speechSynthesis.onvoiceschanged=loadVoices;
+loadVoices();
+
+let vocabulary = [
+{eng:"Accountability", tam:"பொறுப்புணர்வு"},
+{eng:"Adaptability", tam:"சூழ்நிலைக்கு ஏற்ப மாற்றம்"},
+{eng:"Ambition", tam:"முயற்சி மனம்"},
+{eng:"Analysis", tam:"பகுப்பாய்வு"},
+{eng:"Articulate", tam:"தெளிவாக பேசுதல்"},
+{eng:"Assertive", tam:"தன்னம்பிக்கையுடன் இருப்பது"},
+{eng:"Authentic", tam:"உண்மையான"},
+{eng:"Collaboration", tam:"ஒத்துழைப்பு"},
+{eng:"Commitment", tam:"உறுதி"},
+{eng:"Competence", tam:"திறமை"},
+{eng:"Confidential", tam:"ரகசியமான"},
+{eng:"Consistency", tam:"நிலைத்தன்மை"},
+{eng:"Credibility", tam:"நம்பகத்தன்மை"},
+{eng:"Dedication", tam:"அர்ப்பணிப்பு"},
+{eng:"Delegation", tam:"பொறுப்பளிப்பு"},
+{eng:"Dependable", tam:"நம்பத்தகுந்த"},
+{eng:"Diplomatic", tam:"தூதரக நயமான"},
+{eng:"Discipline", tam:"ஒழுக்கம்"},
+{eng:"Efficiency", tam:"திறன்"},
+{eng:"Empathy", tam:"பரிவு"},
+{eng:"Entrepreneur", tam:"தொழில்முனைவோர்"},
+{eng:"Ethical", tam:"நெறிப்படுத்தப்பட்ட"},
+{eng:"Excellence", tam:"மேன்மை"},
+{eng:"Expertise", tam:"சிறப்பு திறமை"},
+{eng:"Flexibility", tam:"நெகிழ்வுத்தன்மை"},
+{eng:"Initiative", tam:"முன்முயற்சி"},
+{eng:"Innovation", tam:"புதுமை"},
+{eng:"Integrity", tam:"நேர்மை"},
+{eng:"Leadership", tam:"தலைமைத்துவம்"},
+{eng:"Management", tam:"மேலாண்மை"},
+{eng:"Meticulous", tam:"மிகுந்த கவனத்துடன்"},
+{eng:"Motivation", tam:"உந்துதல்"},
+{eng:"Negotiation", tam:"பரிசீலனை"},
+{eng:"Objective", tam:"குறிக்கோள்"},
+{eng:"Opportunity", tam:"வாய்ப்பு"},
+{eng:"Organized", tam:"ஒழுங்குபடுத்தப்பட்ட"},
+{eng:"Performance", tam:"செயல்திறன்"},
+{eng:"Persistence", tam:"தொடர்ச்சியான முயற்சி"},
+{eng:"Professionalism", tam:"தொழில்முறை நடத்தை"},
+{eng:"Productivity", tam:"உற்பத்தித்திறன்"},
+{eng:"Punctuality", tam:"நேர்த்தி"},
+{eng:"Resilience", tam:"மீண்டு எழும் திறன்"},
+{eng:"Responsibility", tam:"பொறுப்பு"},
+{eng:"Strategic", tam:"திட்டமிட்ட"},
+{eng:"Sustainability", tam:"நிலைத்த வளர்ச்சி"},
+{eng:"Transparency", tam:"வெளிப்படைத்தன்மை"},
+{eng:"Visionary", tam:"தூரநோக்கு கொண்ட"},
+{eng:"Workplace", tam:"வேலை இடம்"},
+{eng:"Workflow", tam:"வேலை நடைமுறை"},
+{eng:"Work ethic", tam:"வேலை ஒழுக்கம்"}
+];
+
+let sentences = [
+{eng:"I will complete the task by today.", tam:"இன்று இந்த பணியை முடித்து விடுவேன்."},
+{eng:"Please share the updated document.", tam:"புதுப்பிக்கப்பட்ட ஆவணத்தை பகிரவும்."},
+{eng:"Let’s discuss this in detail.", tam:"இதையை விரிவாக பேசலாம்."},
+{eng:"I appreciate your support.", tam:"உங்கள் ஆதரவுக்கு நன்றி."},
+{eng:"I will get back to you shortly.", tam:"நான் விரைவில் பதில் அளிப்பேன்."},
+{eng:"Kindly review the attached file.", tam:"இணைக்கப்பட்ட கோப்பை தயவுசெய்து சரிபார்க்கவும்."},
+{eng:"Please confirm once done.", tam:"முடிந்தவுடன் உறுதிப்படுத்தவும்."},
+{eng:"Let’s schedule a meeting.", tam:"ஒரு கூட்டத்தை ஏற்பாடு செய்வோம்."},
+{eng:"Thank you for your feedback.", tam:"உங்கள் கருத்துக்கு நன்றி."},
+{eng:"I’ll keep you posted.", tam:"தொடர்ந்து தகவல் தெரிவிப்பேன்."},
+{eng:"Please find the attached document.", tam:"இணைக்கப்பட்ட ஆவணத்தை காணவும்."},
+{eng:"As discussed earlier.", tam:"முன்பு பேசியபடி."},
+{eng:"Looking forward to your response.", tam:"உங்கள் பதிலை எதிர்நோக்குகிறேன்."},
+{eng:"Thank you for your time.", tam:"உங்கள் நேரத்திற்கு நன்றி."},
+{eng:"Please let me know if you have any questions.", tam:"ஏதேனும் கேள்விகள் இருந்தால் தெரியப்படுத்தவும்."},
+{eng:"I would like to follow up on this.", tam:"இதைக் குறித்து தொடர்ந்து அறிய விரும்புகிறேன்."},
+{eng:"Kindly acknowledge receipt.", tam:"பெற்றதை உறுதிப்படுத்தவும்."},
+{eng:"We regret the inconvenience caused.", tam:"ஏற்பட்ட சிரமத்திற்கு வருந்துகிறோம்."},
+{eng:"I apologize for the delay.", tam:"தாமதத்திற்கு மன்னிக்கவும்."},
+{eng:"Awaiting your confirmation.", tam:"உங்கள் உறுதிப்பாட்டை எதிர்நோக்குகிறேன்."},
+{eng:"Let’s move to the next agenda.", tam:"அடுத்த விவாதத்திற்கு செல்லலாம்."},
+{eng:"Could you clarify that point?", tam:"அந்த விஷயத்தை தெளிவுபடுத்த முடியுமா?"},
+{eng:"That’s a great suggestion.", tam:"அது ஒரு சிறந்த பரிந்துரை."},
+{eng:"I agree with your perspective.", tam:"உங்கள் கருத்துடன் நான் ஒத்துக்கொள்கிறேன்."},
+{eng:"Let’s finalize this today.", tam:"இதையை இன்று முடிவுபடுத்துவோம்."},
+{eng:"We need to prioritize this task.", tam:"இந்த பணிக்கு முன்னுரிமை அளிக்க வேண்டும்."},
+{eng:"Please share your thoughts.", tam:"உங்கள் கருத்தை பகிரவும்."},
+{eng:"Let’s align on this.", tam:"இதில் ஒரே கருத்தில் வருவோம்."},
+{eng:"I support this idea.", tam:"இந்த யோசனையை ஆதரிக்கிறேன்."},
+{eng:"That sounds reasonable.", tam:"அது நியாயமானதாக இருக்கிறது."},
+{eng:"The project is on track.", tam:"திட்டம் சரியான பாதையில் உள்ளது."},
+{eng:"We need to meet the deadline.", tam:"காலக்கெடுவை பூர்த்தி செய்ய வேண்டும்."},
+{eng:"Let’s improve the performance.", tam:"செயல்திறனை மேம்படுத்துவோம்."},
+{eng:"The results look promising.", tam:"முடிவுகள் நம்பிக்கையளிக்கின்றன."},
+{eng:"We need to analyze the data.", tam:"தரவுகளை பகுப்பாய்வு செய்ய வேண்டும்."},
+{eng:"This requires immediate attention.", tam:"இது உடனடி கவனம் தேவை."},
+{eng:"Please update the status.", tam:"நிலையை புதுப்பிக்கவும்."},
+{eng:"The target has been achieved.", tam:"இலக்கு அடைந்துவிட்டது."},
+{eng:"We need to optimize the process.", tam:"செயல்முறையை மேம்படுத்த வேண்டும்."},
+{eng:"Let’s focus on the main objective.", tam:"முக்கிய இலக்கில் கவனம் செலுத்துவோம்."},
+{eng:"It’s a pleasure working with you.", tam:"உங்களுடன் வேலை செய்வது மகிழ்ச்சி."},
+{eng:"Let’s maintain transparency.", tam:"வெளிப்படைத்தன்மையை பேணுவோம்."},
+{eng:"We value your contribution.", tam:"உங்கள் பங்களிப்பை மதிக்கிறோம்."},
+{eng:"I appreciate your effort.", tam:"உங்கள் முயற்சியை பாராட்டுகிறேன்."},
+{eng:"Let’s work as a team.", tam:"அணியாக வேலை செய்வோம்."},
+{eng:"We need a strategic approach.", tam:"திட்டமிட்ட அணுகுமுறை தேவை."},
+{eng:"Let’s think long term.", tam:"நீண்டகாலமாக யோசிப்போம்."},
+{eng:"That’s a valuable insight.", tam:"அது மதிப்புள்ள கருத்து."},
+{eng:"Thank you for the opportunity.", tam:"இந்த வாய்ப்புக்கு நன்றி."},
+{eng:"I’m confident we can achieve this.", tam:"இதனை நிச்சயமாக அடையலாம் என்று நம்புகிறேன்."}
+];
+function openSection(type){
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("vocab").style.display="none";
+    document.getElementById("sentence").style.display="none";
+
+    let section=document.getElementById(type);
+    section.innerHTML="";
+    section.style.display="block";
+
+    let back=document.createElement("div");
+    back.className="back-btn";
+    back.innerText="⬅ Back to Dashboard";
+    back.onclick=function(){
+        section.style.display="none";
+        document.getElementById("dashboard").style.display="flex";
+    };
+    section.appendChild(back);
+
+    let data=(type==="vocab")?vocabulary:sentences;
+
+    data.forEach((item,index)=>{
+        let div=document.createElement("div");
+        div.className="item";
+        div.style.animationDelay=(index*0.05)+"s";
+        div.innerHTML="<b>"+item.eng+"</b><br>"+item.tam;
+        div.onclick=function(){ speak(item); };
+        section.appendChild(div);
+    });
+}
+
+/* SPEAK FUNCTION */
+function speak(item){
+    speechSynthesis.cancel();
+
+    let tamilUtter=new SpeechSynthesisUtterance(item.tam);
+    tamilUtter.lang="ta-IN";
+    if(tamilVoice) tamilUtter.voice=tamilVoice;
+
+    let englishUtter=new SpeechSynthesisUtterance(item.eng);
+    englishUtter.lang="en-US";
+    if(englishVoice) englishUtter.voice=englishVoice;
+
+    speechSynthesis.speak(tamilUtter);
+
+    tamilUtter.onend=function(){
+        setTimeout(()=>speechSynthesis.speak(englishUtter),500);
+    };
+}
+
+</script>
+
+</body>
+</html>
